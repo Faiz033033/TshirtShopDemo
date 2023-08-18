@@ -9,6 +9,16 @@ const Userdash = (props) => {
   const [medium, setMedium] = useState("");
   const [small, setSmall] = useState("");
 
+  const postDataFuction = (obj) => {
+    fetch(
+      "https://react-http-11-08-2023-default-rtdb.firebaseio.com/product.json",
+      {
+        method: "POST",
+        body: JSON.stringify(obj),
+      }
+    );
+  };
+
   const onDataCollector = (e) => {
     e.preventDefault();
     const itemlist = {
@@ -20,15 +30,8 @@ const Userdash = (props) => {
       sQuantity: small,
       id: Math.random().toString(),
     };
-
     props.onSaveData(itemlist);
-
-    // setName("");
-    // setDescr("");
-    // setPrice("");
-    // setLarge("");
-    // setMedium("");
-    // setSmall("");
+    postDataFuction(itemlist);
   };
 
   return (

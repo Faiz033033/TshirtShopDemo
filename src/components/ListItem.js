@@ -6,8 +6,24 @@ const ListItem = (props) => {
   const { cartData } = CartContext();
   const cartCtx = cartData;
 
+
   const lButtonHandler = () => {
     props.onData(props.item, "lQuantity");
+
+    putDataFunction(
+      { ...props.item, lQuantity: Number(props.item.lQuantity) - 1 },
+      props.item.ckey
+    );
+
+    cartDataFunction({
+      name: props.item.name,
+      descr: props.item.descr,
+      id: props.item.id,
+      price: props.item.price,
+      lQuantity: 1,
+      mQuantity: 0,
+      sQuantity: 0,
+    });
 
     cartCtx.addItem(
       {
@@ -19,8 +35,25 @@ const ListItem = (props) => {
       "lQuantity"
     );
   };
+
   const mButtonHandler = () => {
     props.onData(props.item, "mQuantity");
+
+    putDataFunction(
+      { ...props.item, mQuantity: Number(props.item.mQuantity) - 1 },
+      props.item.ckey
+    );
+
+    cartDataFunction({
+      name: props.item.name,
+      descr: props.item.descr,
+      id: props.item.id,
+      price: props.item.price,
+      lQuantity: 0,
+      mQuantity: 1,
+      sQuantity: 0,
+    });
+
     cartCtx.addItem(
       {
         name: props.item.name,
@@ -31,8 +64,25 @@ const ListItem = (props) => {
       "mQuantity"
     );
   };
+
   const sButtonHandler = () => {
     props.onData(props.item, "sQuantity");
+
+    putDataFunction(
+      { ...props.item, sQuantity: Number(props.item.sQuantity) - 1 },
+      props.item.ckey
+    );
+
+    cartDataFunction({
+      name: props.item.name,
+      descr: props.item.descr,
+      id: props.item.id,
+      price: props.item.price,
+      lQuantity: 0,
+      mQuantity: 0,
+      sQuantity: 1,
+    });
+
     cartCtx.addItem(
       {
         name: props.item.name,
@@ -41,6 +91,68 @@ const ListItem = (props) => {
         price: props.item.price,
       },
       "sQuantity"
+    );
+  };
+
+  const putDataFunction = (obj, id) => {
+    fetch(
+      `https://react-http-11-08-2023-default-rtdb.firebaseio.com/product/${id}.json`,
+      {
+        method: "PUT",
+        body: JSON.stringify(obj),
+      }
+    );
+  };
+
+  const cartDataFunction = (obj) => {
+    let existingItemIdx = cartCtx.tshirstCartdata.findIndex(
+      (ele) => ele.id === obj.id
+    );
+    if (existingItemIdx === -1) {
+      fetch(
+        `https://react-http-11-08-2023-default-rtdb.firebaseio.com/cartData.json`,
+        {
+          method: "POST",
+          body: JSON.stringify(obj),
+        }
+      );
+    }
+  };
+
+  const fireFunction = (item, size) => {
+    console.log(item, size);
+    let findEle = cartData.tshirstCartdata.find((ele) => ele.id === item.id);
+
+    console.log(findEle);
+
+    // if (findEle !== undefined) {
+    if (size === "lQuantity" && findEle) {
+      putCartFunction(
+        { ...findEle, lQuantity: Number(findEle.lQuantity) + 1 },
+        findEle.ckey
+      );
+    } else if (size === "mQuantity" && findEle) {
+      putCartFunction(
+        { ...findEle, mQuantity: Number(findEle.mQuantity) + 1 },
+        findEle.ckey
+      );
+    } else if (size === "sQuantity" && findEle) {
+      putCartFunction(
+        { ...findEle, sQuantity: Number(findEle.sQuantity) + 1 },
+        findEle.ckey
+      );
+    }
+    // }
+  };
+
+  const putCartFunction = (obj, id) => {
+    console.log(obj, id);
+    fetch(
+      `https://react-http-11-08-2023-default-rtdb.firebaseio.com/cartData/${id}.json`,
+      {
+        method: "PUT",
+        body: JSON.stringify(obj),
+      }
     );
   };
 
@@ -61,7 +173,10 @@ const ListItem = (props) => {
             <Col md={2}>
               <Button
                 disabled={props.item.lQuantity === 0}
-                onClick={lButtonHandler}
+                onClick={() => {
+                  lButtonHandler();
+                  fireFunction(props.item, "lQuantity");
+                }}
               >
                 Buy Large({props.item.lQuantity})
               </Button>
@@ -69,7 +184,10 @@ const ListItem = (props) => {
             <Col md={2}>
               <Button
                 disabled={props.item.mQuantity === 0}
-                onClick={mButtonHandler}
+                onClick={() => {
+                  mButtonHandler();
+                  fireFunction(props.item, "mQuantity");
+                }}
               >
                 Buy Medium({props.item.mQuantity})
               </Button>
@@ -77,7 +195,10 @@ const ListItem = (props) => {
             <Col md={2}>
               <Button
                 disabled={props.item.sQuantity === 0}
-                onClick={sButtonHandler}
+                onClick={() => {
+                  sButtonHandler();
+                  fireFunction(props.item, "sQuantity");
+                }}
               >
                 Buy Small({props.item.sQuantity})
               </Button>

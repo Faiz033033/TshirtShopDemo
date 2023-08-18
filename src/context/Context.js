@@ -10,6 +10,7 @@ const Context = (props) => {
   const [cartItems, setCartItem] = useState([]);
 
   const addItemHandler = (item, size) => {
+
     setCartItem((prevItem) => {
       let existingItemIdx = prevItem.findIndex((ele) => ele.id === item.id);
       let existingItem = prevItem[existingItemIdx];
@@ -63,26 +64,10 @@ const Context = (props) => {
     });
   };
 
-  // console.log(upItemlist);
-
-  // const removeTshirt = (item, size) => {
-  //   console.log(item, size);
-  //   setUpItemlist(() => {
-  //     let updateProductList;
-  //     let updateProductqty;
-  //     if (size === "lQuantity") {
-  //       updateProductqty = { ...item, lQuantity: item.lQuantity - 1 };
-  //     }
-  //   });
-  // };
-
-  // const updatedQtyData = {
-  //   updatedQty: removeTshirt,
-  // };
-
   const cartData = {
     tshirstCartdata: cartItems,
     addItem: addItemHandler,
+    setCartItem,
   };
 
   return <Cart.Provider value={{ cartData }}>{props.children}</Cart.Provider>;

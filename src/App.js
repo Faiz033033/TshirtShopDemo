@@ -1,13 +1,17 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes} from "react-router-dom";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Header from "./components/Header";
 import Home from "./components/Home";
 import Cart from "./components/Cart";
+import { CartContext } from "./context/Context";
 
 function App() {
   const [itemList, setItemList] = useState([]);
   const [cartShows, setCartShows] = useState(false);
+  const {
+    cartData: { setCartItem },
+  } = CartContext();
 
   const dataHandler = (input) => {
     setItemList((prevState) => {
@@ -16,7 +20,7 @@ function App() {
   };
 
   const updateQTY = (item, size) => {
-    console.log(item, size);
+    // console.log(item, size);
 
     if (item) {
       setItemList((prevItem) => {
@@ -65,6 +69,54 @@ function App() {
   const showCarthandler = () => {
     setCartShows(true);
   };
+
+  const datafetchfunction = useCallback(() => {
+    fetch(
+      "https://react-http-11-08-2023-default-rtdb.firebaseio.com/product.json"
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .then((data) => {
+        let dataSet = [];
+        for (const key in data) {
+          dataSet.push({
+            ckey: key,
+            ...data[key],
+          });
+        }
+        setItemList(dataSet);
+      });
+
+    fetch(
+      "https://react-http-11-08-2023-default-rtdb.firebaseio.com/cartData.json"
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .then((data) => {
+        let dataSet = [];
+        for (const key in data) {
+          dataSet.push({
+            ckey: key,
+            ...data[key],
+          });
+        }
+        console.log(dataSet);
+        setCartItem(dataSet);
+      });
+  }, [setCartItem]);
+
+
+  useEffect(() => {
+    datafetchfunction();
+  }, [datafetchfunction]);
 
   return (
     <BrowserRouter>
